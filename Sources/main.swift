@@ -28,12 +28,12 @@ var done = false
 
 let url = "http://xkcd.com/info.0.json"
 fetchJSONData(NSURL(string: url)!) {comicDict in
-    print(comicDict)
-    let img_link = comicDict["img"] as! String
-    print(img_link)
-    fetchData(NSURL(string: img_link)!) {data in
+    let imgLink = comicDict["img"] as! String
+    fetchData(NSURL(string: imgLink)!) {data in
         defer {
             done = true
+            let imgAltText = comicDict["alt"] as! String
+            print(imgAltText)
         }
         do {
             try printImage(data: data)
