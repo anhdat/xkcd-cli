@@ -1,5 +1,6 @@
 import Foundation
 import ImagePrinting
+import Docoptswift
 
 
 func fetchData(url: NSURL, completion: (data: NSData) -> ()) {
@@ -24,7 +25,7 @@ func fetchJSONData(url: NSURL, completion: (jsonDict: NSDictionary) -> ()) {
 }
 
 
-func loadLatestStrip() {
+func loadLatestStrip(shouldPrintAltText shouldPrintAltText: Bool = false) {
     var done = false
 
     let latestStripLink = "http://xkcd.com/info.0.json"
@@ -39,8 +40,11 @@ func loadLatestStrip() {
             } catch {
                 print(error)
             }
-            let imgAltText = comicDict["alt"] as! String
-            print(imgAltText)
+
+            if shouldPrintAltText {
+                let imgAltText = comicDict["alt"] as! String
+                print(imgAltText)
+            }
         }
     }
 
@@ -49,4 +53,34 @@ func loadLatestStrip() {
     }
 }
 
-loadLatestStrip()
+
+let doc : String = "xkcd-cli - xkcd on iTerm\n" +
+"\n" +
+"Usage:\n" +
+"  xkcd [(-a | --altText)]\n" +
+"  xkcd (-h | --help)\n" +
+"\n" +
+"Options:\n" +
+"  -h, --help\n"
+"  -a, --altText [default: false]\n"
+
+
+func getTerminalInput() -> [String: AnyObject] {
+    let args = Array(Process.arguments.dropFirst())
+    // print(args)
+    return Docopt.parse(doc, argv: args)
+}
+
+
+func main() {
+    let terminalInput = getTerminalInput()
+
+    // Use force unwrap because Optional form Dictionary subscripting will be cast to false
+    let inputAltTextOption: Bool = terminalInput["--altText"] as! Bool
+    let inputAltTextShortOption: Bool = terminalInput["-a"] as! Bool
+    let shouldPrintAltText = inputAltTextOption || inputAltTextShortOption
+
+    loadLatestStrip(shouldPrintAltText: shouldPrintAltText)
+}
+
+main()
