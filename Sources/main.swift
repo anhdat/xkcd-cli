@@ -24,25 +24,29 @@ func fetchJSONData(url: NSURL, completion: (jsonDict: NSDictionary) -> ()) {
 }
 
 
-var done = false
+func loadLatestStrip() {
+    var done = false
 
-let url = "http://xkcd.com/info.0.json"
-fetchJSONData(NSURL(string: url)!) {comicDict in
-    let imgLink = comicDict["img"] as! String
-    fetchData(NSURL(string: imgLink)!) {data in
-        defer {
-            done = true
-            let imgAltText = comicDict["alt"] as! String
-            print(imgAltText)
+    let latestStripLink = "http://xkcd.com/info.0.json"
+    fetchJSONData(NSURL(string: latestStripLink)!) {comicDict in
+        let imgLink = comicDict["img"] as! String
+        fetchData(NSURL(string: imgLink)!) {data in
+            defer {
+                done = true
+                let imgAltText = comicDict["alt"] as! String
+                print(imgAltText)
+            }
+            do {
+                try printImage(data: data)
+            } catch {
+                print(error)
+            }
         }
-        do {
-            try printImage(data: data)
-        } catch {
-            print(error)
-        }
+    }
+
+    while !done {
+        continue
     }
 }
 
-while !done {
-    continue
-}
+loadLatestStrip()
