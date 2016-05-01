@@ -33,14 +33,14 @@ func loadLatestStrip() {
         fetchData(NSURL(string: imgLink)!) {data in
             defer {
                 done = true
-                let imgAltText = comicDict["alt"] as! String
-                print(imgAltText)
             }
             do {
                 try printImage(data: data)
             } catch {
                 print(error)
             }
+            let imgAltText = comicDict["alt"] as! String
+            print(imgAltText)
         }
     }
 
